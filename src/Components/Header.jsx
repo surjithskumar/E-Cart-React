@@ -1,42 +1,53 @@
-import React from 'react'
-import { Badge, Container, Form, Nav, Navbar } from 'react-bootstrap'
+import React, { useEffect, useState } from 'react'
+import { Container, Nav, Navbar, Form, Badge } from 'react-bootstrap'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { searchProduct } from '../Redux/slice/productSlice'
 
-function Header() {
+function Header({ insideHome }) {
+  const dispatch = useDispatch()
+  const [wishlistCount, setWishlistCount] = useState(0)
+  const [cartCount, setCartCount] = useState(0)
+  const { wishlist } = useSelector(state => state.wishListReducer)
+  const cart = useSelector((state) => state.cartReducer)
+
+  useEffect(() => {
+    setWishlistCount(wishlist.length)
+    setCartCount(cart.length)
+  }, [wishlist, cart])
+
   return (
     <>
-      <Navbar expand="lg" className="bg-info">
-      <Container>
-        <Navbar.Brand>
-            <Link to={'/'} style={{textDecoration:"none",color:"black",fontSize:"30px"}}><i class="fa-solid fa-cart-shopping fa-beat-fade"></i>
-            E-Cart
-            </Link>
-        </Navbar.Brand>
-        <Form.Control
-              type="text"
-              placeholder="Search"
-              className=" ms-5 w-25"
-        />
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="ms-5">
+      <Navbar expand="lg" className="fixed-top" style={{ backgroundColor: "rgb(9, 214, 15)" }}>
+        <Container>
+          <Navbar.Brand >
+            <Link to={'/'} style={{ textDecoration: "none", color: "white", fontSize: "30px" }}><i class="fa-solid fa-truck-fast fa-bounce"></i> E-Cart</Link>
+          </Navbar.Brand>
 
-            <Nav.Link className='btn btn-outline-dark'>
-                <Link to={'/wishlist'} style={{color:"black", fontWeight:"bold",textDecoration:"none"}}><i class="fa-solid fa-heart"></i> Wishlist
-                <Badge bg="success rounded mx-2">0</Badge>
-                </Link>
-            </Nav.Link>
+          {insideHome && <Form.Control
+            type="text"
+            placeholder="Search"
+            className="ms-5 w-25"
+            onChange={e => dispatch(searchProduct(e.target.value.toLowerCase()))}
+          />}
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="ms-auto">
+              <Nav.Link className='btn btn-outline-light ' >
+                <Link to={'/wishlist'} style={{ color: "black", fontWeight: "bold", textDecoration: "none" }}>
+                  <i class="fa-solid fa-heart text-danger"></i> Wishlist
+                  <Badge bg="success rounded ms-2">{wishlistCount}</Badge></Link>
+              </Nav.Link>
 
-            <Nav.Link className='btn btn-outline-dark'>
-                <Link to={'/wishlist'} style={{color:"black", fontWeight:"bold",textDecoration:"none"}}><i class="fa-solid fa-cart-shopping"></i> Cart
-                <Badge bg="success rounded mx-2">0</Badge>
-                </Link>
-            </Nav.Link>
-
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
+              <Nav.Link className='btn btn-outline-light ms-2' >
+                <Link to={'/cart'} style={{ color: "black", fontWeight: "bold", textDecoration: "none" }} >
+                  <i class="fa-solid fa-cart-shopping text-warning"></i> Cart
+                  <Badge bg="success rounded ms-2">{cartCount}</Badge></Link>
+              </Nav.Link>
+            </Nav>
+          </Navbar.Collapse>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        </Container>
+      </Navbar>
     </>
   )
 }
